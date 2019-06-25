@@ -12,7 +12,7 @@ import sdrutils
 ##################################################
 if __name__ == '__main__':
 
-    parser=OptionParser(option_class=eng_option, usage="%prog: [options]")
+    parser=OptionParser(option_class=eng_option, usage="%prog: [options]\nRecord a single channel from USRP")
     parser.add_option("-f", "--freq", type="eng_float", default=89.7e6,
                       help="Center frequency [default=%default]")
     parser.add_option("--gain", type="eng_float", default=28,
