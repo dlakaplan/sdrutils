@@ -4,6 +4,7 @@ import sdrutils
 ##################################################
 def main():
     usage="Usage: %prog <file>\n"
+    usage+="Convert gnuradio binary data to FITS format\n"
     parser = OptionParser(usage=usage)
     parser.add_option('-s','--separate',action='store_false',
                       dest='merge',
