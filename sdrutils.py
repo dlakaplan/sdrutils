@@ -1,3 +1,14 @@
+"""
+Utilities for SDR
+
+gr2fits: convert gnuradio binary output to FITS
+sdrdata: store/process SDR data, from FITS or direct from RTLSDR
+FX: FX correlator
+dual_recorder: use 2 channels on USRP to record
+single_recorder: use 1 channel on USRP to record
+
+"""
+
 import pmt
 from gnuradio.blocks import parse_file_metadata
 import numpy as np,scipy,scipy.signal
@@ -350,6 +361,15 @@ class dual_recorder(gr.top_block):
                  samples=1e6,
                  out=None,
                  verbose=True):
+        """
+        s=dual_recorder(samp_rate=256e3,
+        gain1=28,
+        gain2=28,
+        freq=89.7e6,
+        samples=1e6,
+        out=None,
+        verbose=True)
+        """
         gr.top_block.__init__(self)
         
         ##################################################
@@ -438,6 +458,16 @@ class single_recorder(gr.top_block):
                  samples=1e6,
                  out=None,
                  verbose=True):
+
+
+        """
+        s=single_recorder(samp_rate=256e3,
+        gain=28,
+        freq=89.7e6,
+        samples=1e6,
+        out=None,
+        verbose=True)
+        """
         gr.top_block.__init__(self)
         
         ##################################################
@@ -472,21 +502,13 @@ class single_recorder(gr.top_block):
         self.uhd_usrp_source_0.set_center_freq(self.freq, 0)
         self.uhd_usrp_source_0.set_gain(self.gain, 0)
         self.uhd_usrp_source_0.set_antenna("TX/RX", 0)
-        self.uhd_usrp_source_0.set_auto_dc_offset(True, 1)
-        self.uhd_usrp_source_0.set_auto_iq_balance(True, 1)  
-        #self.uhd_usrp_source_0.set_center_freq(self.freq, 1)
-        #self.uhd_usrp_source_0.set_gain(self.gain2, 1)
-        #self.uhd_usrp_source_0.set_antenna("RX2", 1)
-        #self.uhd_usrp_source_0.set_auto_dc_offset(True, 1)
-        #self.uhd_usrp_source_0.set_auto_iq_balance(True, 1)
-  
 
 
         self.filenamebase=datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
         if self.out is not None:
             self.filenamebase=os.path.join(self.out,self.filenamebase)
         self.filename_1='%s.dat' % self.filenamebase
-        #self.filename_2='%s_2.dat' % self.filenamebase
+
         if self.verbose:
             print('Will write output to %s' % (self.filename_1))
         
@@ -497,22 +519,12 @@ class single_recorder(gr.top_block):
                                                              True, 1000000, "", False)
 
         self.blocks_file_meta_sink_1.set_unbuffered(False)
-        #self.blocks_file_meta_sink_2 = blocks.file_meta_sink(gr.sizeof_gr_complex*1,
-        #                                                     self.filename_2,
-        #                                                     self.samp_rate, 1,
-        #                                                     blocks.GR_FILE_FLOAT,
-        #                                                     True, 1000000, "", False)
-        #self.blocks_file_meta_sink_2.set_unbuffered(False)
 
         ##################################################
         # Connections
         ##################################################
         self._head1=blocks.head(gr.sizeof_gr_complex,
                                 int(self.samples))
-        #self._head2=blocks.head(gr.sizeof_gr_complex,
-        #                        int(self.samples))
         
         self.connect((self.uhd_usrp_source_0, 0), self._head1,
                      (self.blocks_file_meta_sink_1, 0))    
-        #self.connect((self.uhd_usrp_source_0, 1), self._head2,
-        #             (self.blocks_file_meta_sink_2, 0))    
